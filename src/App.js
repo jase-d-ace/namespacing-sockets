@@ -11,39 +11,50 @@ const socket = io('http://localhost:8080')
 
 class App extends Component {
 
+  state = {
+    room: ''
+  }
+
+  constructor(props, context) {
+    super(props);
+    this.handleInputChange = this.handleInputChange.bind(this)
+    this.joinRoom = this.joinRoom.bind(this)
+  }
+
   componentDidMount() {
     socket.emit('enter room', {
-      room: 'test room'
+      room: 'somewhere new'
+    })
+    socket.on('open rooms', ({open_rooms}) => {
+      console.log('open rooms are...', open_rooms)
     })
   }
-  joinDifferentRoom() {
+
+  handleInputChange(e) {
+    let name = e.target.name;
+    let value = e.target.value;
+    this.setState({
+      [name]: value
+    })
+  }
+
+  joinRoom() {
     socket.emit('enter room', {
-      room: 'other room'
+      room: this.state.room
     })
   }
-  checkClients() {
-    socket.emit('check roster', {
-      room: 'test room'
-    })
+
+  checkRooms() {
+    socket.emit('check rooms')
   }
-  checkOtherClients() {
-    socket.emit('check roster', {
-      room: 'other room'
-    })
-  }
-  leaveRoom() {
-    socket.emit('leave room', {
-      room: 'test room'
-    })
-  }
+
   render() {
     return (
       <div className="App">
         <h1>hihihhi</h1>
-        <button onClick={this.joinDifferentRoom}>Clickmepls</button>
-        <button onClick={this.checkClients}>Clickmetoopls</button>
-        <button onClick={this.checkOtherClients}>Clickmethreepls</button>
-        <button onClick={this.leaveRoom}>Clickmefourpls</button>
+        <input type="text" name="room" onChange={this.handleInputChange} placeholder="create a new room?" />
+        <button onClick={this.checkRooms}>check available rooms</button>
+        <button onClick={this.joinRoom}>Join the room</button>
       </div>
     );
   }

@@ -18,6 +18,12 @@ io.on('connection', (socket) => {
       console.log('left room', io.sockets.adapter.rooms[room].sockets)
     })
   })
+  socket.on('check rooms', () => {
+    console.log('open rooms are...', io.sockets.adapter.rooms)
+    socket.emit('open rooms', {
+      open_rooms: io.sockets.adapter.rooms
+    })
+  })
 });
 
 io.listen(PORT);
