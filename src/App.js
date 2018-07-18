@@ -12,13 +12,32 @@ const socket = io('http://localhost:8080')
 class App extends Component {
 
   state = {
-    room: ''
+    room: '',
+    onlinePeople: [
+      {
+        name: 'test',
+        id: 0
+      },
+      {
+        name: 'other',
+        id: 1
+      },
+      {
+        name: 'foo',
+        id: 2
+      },
+      {
+        name: 'bar',
+        id: 3
+      }
+    ]
   }
 
   constructor(props, context) {
     super(props);
     this.handleInputChange = this.handleInputChange.bind(this)
     this.joinRoom = this.joinRoom.bind(this)
+    this.renderPeople = this.renderPeople.bind(this)
   }
 
   componentDidMount() {
@@ -38,14 +57,24 @@ class App extends Component {
     })
   }
 
+  renderPeople() {
+    return this.state.onlinePeople.map(({name, id}) => (
+      <li key={id} onClick={() => this.setRooms(name)}>{name}</li>
+    ))
+  }
+
   joinRoom() {
     socket.emit('enter room', {
       room: this.state.room
     })
   }
 
-  checkRooms() {
-    socket.emit('check rooms')
+  setRooms(name) {
+    this.setState({
+      room: name
+    }, () => {
+      console.log('changed rooms', this.state.room)
+    })
   }
 
   render() {
@@ -55,6 +84,9 @@ class App extends Component {
         <input type="text" name="room" onChange={this.handleInputChange} placeholder="create a new room?" />
         <button onClick={this.checkRooms}>check available rooms</button>
         <button onClick={this.joinRoom}>Join the room</button>
+        <ul>
+          {this.state.onlinePeople ? this.renderPeople() : ''}
+        </ul>
       </div>
     );
   }
